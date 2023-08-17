@@ -6,7 +6,36 @@
     <title>Document</title>
 </head>
 <body>
-    <h1>Hello world!</h1>
-    <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Error in nemo vero sunt ab aliquid, cum facere expedita voluptas, earum reprehenderit ex nam? Alias cumque debitis, enim porro quisquam possimus?</p>
+    <form class="search-form" id="search-form">
+        <input
+          type="text"
+          name="searchQuery"
+          autocomplete="off"
+          placeholder="Search images..."
+        />
+        <button type="submit">Search</button>
+      </form>
+      <div class="gallery">
+        <!-- Картки зображень -->
+        <div class="photo-card">
+            <img src="" alt="" loading="lazy" />
+            <div class="info">
+              <p class="info-item">
+                <b>Likes</b>
+              </p>
+              <p class="info-item">
+                <b>Views</b>
+              </p>
+              <p class="info-item">
+                <b>Comments</b>
+              </p>
+              <p class="info-item">
+                <b>Downloads</b>
+              </p>
+            </div>
+          </div>
+      </div>
+      <button type="button" class="load-more">Load more</button>
+      <script type="module" src="./index.js"></script>
 </body>
 </html>
