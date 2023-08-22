@@ -13,6 +13,13 @@ const perPage = 40;
 let page = 1;
 let keyOfSearchPhoto = '';
 
+notifyParams = {
+  position: 'center-center',
+        timeout: 5000,
+        width: '400px',
+        fontSize: '24px'
+}
+
 let lightbox = new SimpleLightbox('.img_wrap a', { 
     captionsData: 'alt',
     captionDelay: 250,
@@ -37,19 +44,64 @@ function onSubmitForm(evt){
             Notify.failure('Sorry, there are no images matching your search query. Please try again.', notifyParams)
         }else{
             createMarkup(searchResults)
-            SimpleLightbox.refresh()
+            lightbox.refresh()
         }
         if(data.totalHits > perPage){
             loadMoreEl.classList.remove('is-hidden');
-            window.addEventListener('scrol', showLoadMorePage);           
-            
-        }        
+            window.addEventListener('scrol', showLoadMorePage);          
+        } 
+        scrollPage()       
     })
-    .catch(onFetchError);
+    .catch (fetchError) 
 
     loadMoreEl.addEventListener('click', onLoadMoreClick);
 
     evt.currentTarget.reset();
+}
+function onLoadMoreClick(){
+  page +=1;
+  fetchPhoto(keyOfSearchPhoto, page, perPage)
+  .then(data => {
+    const searchResults = data.hits;
+    const numberOfPage = Math.ceil(data.totalHits / perPage);
+
+    if(page === numberOfPage){
+      loadMoreEl.classList.add("is-hidden");
+      Notify.info("We're sorry, but you've reached the end of search results.");
+      loadMoreEl.removeEventListener('click', onLoadMoreClick);
+      window.removeEventListener('scrol', showLoadMorePage);
+    }
+    lightbox.refresh()
+    scrollPage()
+  })
+  .catch (fetchError)
+}
+
+function fetchError(){
+  Notify.failure('Oops! Something went wrong! Try reloading the page or make another choice!', notifyParams)
+}
+
+function scrollPage(){
+  const { height: cardHeight } = document
+  .querySelector(".gallery")
+  .firstElementChild.getBoundingClientRect();
+
+window.scrollBy({
+  top: cardHeight * 2,
+  behavior: "smooth",
+});
+}
+
+function showLoadMorePage() {
+  if (checkIfEndOfPage()) {
+      onClickLoadMore();
+  };
+};
+
+function checkIfEndOfPage() {
+return (
+  window.innerHeight + window.scrollY >= document.documentElement.scrollHeight
+);
 }
 
 function createMarkup(searchResults){
