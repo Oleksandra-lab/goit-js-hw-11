@@ -13,7 +13,7 @@ const perPage = 40;
 let page = 1;
 let keyOfSearchPhoto = '';
 
-notifyParams = {
+const notifyParams = {
   position: 'center-center',
         timeout: 5000,
         width: '400px',
