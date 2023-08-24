@@ -9,7 +9,7 @@ const searchFormEl = document.querySelector('.search-form');
 const galleryEl = document.querySelector('.gallery');
 const loadMoreEl = document.querySelector('.load-more');
 
-const perPage = 20;
+const perPage = 40;
 let page = 1;
 let keyOfSearchPhoto = '';
 
@@ -65,7 +65,7 @@ function onLoadMoreClick(){
     const searchResults = data.hits;
     const numberOfPage = Math.ceil(data.totalHits / perPage);
 
-    createMarkup(searchResults)
+    createMarkup(searchResults);
     if(page === numberOfPage){
       loadMoreEl.classList.add("is-hidden");
       Notify.info("We're sorry, but you've reached the end of search results.");
