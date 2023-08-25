@@ -8,9 +8,11 @@ import "simplelightbox/dist/simple-lightbox.min.css";
 const searchFormEl = document.querySelector('.search-form');
 const galleryEl = document.querySelector('.gallery');
 const loadMoreEl = document.querySelector('.load-more');
+loadMoreEl.addEventListener('click', onLoadMoreClick);
 
 const perPage = 40;
 let page = 1;
+
 let keyOfSearchPhoto = '';
 
 const notifyParams = {
@@ -36,46 +38,43 @@ function onSubmitForm(evt){
     page = 1
     const { searchQuery } = evt.currentTarget.elements;
     keyOfSearchPhoto = searchQuery.value.trim().toLowerCase().split(' ').join('+');
-
+    loadMoreEl.classList.add('is-hidden');
     fetchPhoto(keyOfSearchPhoto, page, perPage)
-    .then(data => {
-        const searchResults = data.hits;
-        if(data.totalHits === 0){
-            Notify.failure('Sorry, there are no images matching your search query. Please try again.', notifyParams)
-        }else{
-            createMarkup(searchResults)
-            lightbox.refresh()
+    .then(({hits, totalHits}) => {
+        
+        if(hits.length === 0){
+            return Notify.failure('Sorry, there are no images matching your search query. Please try again.', notifyParams)
         }
-        if(data.totalHits > perPage){
+            createMarkup(hits)
+            lightbox.refresh()
+      
+        if(hits.length===perPage&&totalHits>perPage){
             loadMoreEl.classList.remove('is-hidden');
-            window.addEventListener('scrol', showLoadMorePage);          
+            
         } 
         scrollPage()       
     })
-    .catch (fetchError) 
+    .catch (error => console.log(error.message)); 
 
-    loadMoreEl.addEventListener('click', onLoadMoreClick);
+    
 
     evt.currentTarget.reset();
 }
 function onLoadMoreClick(){
   page +=1;
   fetchPhoto(keyOfSearchPhoto, page, perPage)
-  .then(data => {
-    const searchResults = data.hits;
-    const numberOfPage = Math.ceil(data.totalHits / perPage);
-
-    createMarkup(searchResults);
-    if(page === numberOfPage){
+  .then(({hits, totalHits}) => {
+    
+    createMarkup(hits);
+    if(page*perPage>=totalHits){
       loadMoreEl.classList.add("is-hidden");
       Notify.info("We're sorry, but you've reached the end of search results.");
-      loadMoreEl.removeEventListener('click', onLoadMoreClick);
-      window.removeEventListener('scrol', showLoadMorePage);
+      
     }
     lightbox.refresh()
     scrollPage()
   })
-  .catch (fetchError)
+  .catch (error => console.log(error.message))
 }
 
 function fetchError(){
@@ -91,18 +90,6 @@ window.scrollBy({
   top: cardHeight * 2,
   behavior: "smooth",
 });
-}
-
-function showLoadMorePage() {
-  if (checkIfEndOfPage()) {
-    onLoadMoreClick();
-  };
-};
-
-function checkIfEndOfPage() {
-return (
-  window.innerHeight + window.scrollY >= document.documentElement.scrollHeight
-);
 }
 
 function createMarkup(searchResults){
